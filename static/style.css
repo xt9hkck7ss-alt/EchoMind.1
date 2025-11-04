@@ -1,0 +1,31 @@
+/* Fade-in animation for quiz container */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#quiz-container {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Correct and incorrect answer highlights */
+.correct {
+    background-color: #d4edda;
+    border-left: 5px solid #28a745;
+    padding-left: 10px;
+    transition: background-color 0.5s ease;
+}
+
+.incorrect {
+    background-color: #f8d7da;
+    border-left: 5px solid #dc3545;
+    padding-left: 10px;
+    transition: background-color 0.5s ease;
+}
+
+/* Button bounce on click */
+button:active {
+    transform: scale(0.95);
+    transition: transform 0.1s;
+}
+

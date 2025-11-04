@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoMind Quiz Adventure</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* === BODY & THEMES === */
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(120deg, #1e0033, #4b0082, #00ffd5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: #fff;
+    overflow: hidden;
+    transition: background 0.5s, color 0.5s;
+  }
+  body.light {
+    background: linear-gradient(120deg, #a8edea, #fed6e3);
+    color: #111;
+  }
+
+  /* === QUIZ CONTAINER === */
+  #quiz-container {
+    background: rgba(0,0,0,0.7);
+    border-radius: 25px;
+    padding: 30px 25px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 0 40px rgba(0,0,0,0.7);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.5s;
+  }
+  body.light #quiz-container { background: #fff; color: #111; }
+
+  h1 {
+    color: #00ffd5;
+    text-shadow: 0 0 10px #00ffd5;
+    margin-bottom: 20px;
+  }
+
+  /* === INPUT & BUTTONS === */
+  input[type="text"] {
+    padding: 10px;
+    border-radius: 20px;
+    border: none;
+    width: 80%;
+    margin-bottom: 15px;
+    font-size: 16px;
+  }
+  button {
+    border: none;
+    border-radius: 50px;
+    padding: 12px 25px;
+    margin: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px #00ffd5;
+  }
+  button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px #00ffee;
+  }
+  .action-btn { background: linear-gradient(90deg,#00ffd5,#00aaff); color:#111; }
+  .cat-btn, .mode-btn { background: linear-gradient(90deg,#ff6f91,#ffc75f); color:#111; }
+
+  /* === QUESTION CARD === */
+  .question-card {
+    display: none;
+    flex-direction: column;
+    animation: fadeIn 0.5s ease;
+  }
+  .question-card.active { display: flex; }
+  label {
+    display:block;
+    background: rgba(255,255,255,0.1);
+    padding:12px;
+    border-radius:15px;
+    margin:8px 0;
+    cursor:pointer;
+    transition: 0.3s all;
+    user-select:none;
+  }
+  label:hover { background: rgba(255,255,255,0.2); transform: scale(1.03);}
+  label.correct { background: #28a745; color:#fff; }
+  label.incorrect { background: #dc3545; color:#fff; }
+  input[type="radio"] { display:none; }
+
+  /* === PROGRESS & TIMER === */
+  #progress-bar {
+    height: 12px;
+    width:0%;
+    background:#00ffd5;
+    border-radius:6px;
+    margin-bottom:15px;
+    transition: width 0.3s ease;
+  }
+  #timer { font-size:18px; color:#ffeb3b; margin-bottom:10px; }
+
+  /* === CHARACTER & CONFETTI === */
+  #character {
+    width: 80px;
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    transition: transform 0.5s ease;
+  }
+  #confetti div {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #ffeb3b;
+    opacity: 0.8;
+    animation: fall 2s linear infinite;
+  }
+
+  /* === ANIMATIONS === */
+  @keyframes fadeIn { from {opacity:0; transform:scale(0.9);} to {opacity:1; transform:scale(1);} }
+  @keyframes fall { 0%{transform: translateY(-10px) rotate(0deg);} 100%{transform: translateY(600px) rotate(360deg);} }
+</style>
+</head>
+<body>
+
+<div id="quiz-container">
+  <h1>EchoMind Quiz Adventure</h1>
+
+  <div id="progress-bar"></div>
+  <div id="timer"></div>
+
+  <div id="player-name-section">
+    <p>Enter your name:</p>
+    <input type="text" id="player-name" placeholder="Your name">
+    <button id="start-game" class="action-btn">Start</button>
+  </div>
+
+  <div id="category-select" style="display:none;">
+    <p>Select a Category:</p>
+    <button class="cat-btn" data-cat="math">Math</button>
+    <button class="cat-btn" data-cat="science">Science</button>
+    <button class="cat-btn" data-cat="geo">Geography</button>
+  </div>
+
+  <div id="mode-select" style="display:none;">
+    <p>Select Difficulty:</p>
+    <button class="mode-btn" data-mode="easy">Easy</button>
+    <button class="mode-btn" data-mode="medium">Medium</button>
+    <button class="mode-btn" data-mode="hard">Hard</button>
+  </div>
+
+  <div id="questions"></div>
+
+  <button id="lifeline-btn" style="display:none;">💡 50/50 Lifeline</button>
+  <button id="hint-btn" style="display:none;">🧠 Hint</button>
+  <button id="next-btn">Next</button>
+  <button id="repeat-btn">Play Again</button>
+
+  <div id="score"></div>
+  <div id="fun-text"></div>
+  <div id="leaderboard"></div>
+  <div id="confetti"></div>
+  <button id="theme-toggle" class="action-btn" style="margin-top:15px;">🌗 Toggle Theme</button>
+</div>
+
+<img id="character" src="https://via.placeholder.com/80x80/00ffd5/111?text=Char" alt="Character">
+
+<audio id="bg-music" src="https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3" loop autoplay volume="0.2"></audio>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>
